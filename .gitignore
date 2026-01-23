@@ -1,0 +1,54 @@
+# Terraform
+
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraform.lock.hcl
+
+
+# Kubernetes / EKS
+
+kubeconfig*
+.kube/
+*.kubeconfig
+
+
+# Backstage / Node
+
+node_modules/
+dist/
+build/
+yarn-error.log
+npm-debug.log*
+.pnpm-debug.log*
+
+
+# Docker
+
+*.log
+docker-compose.override.yml
+
+
+# OS / IDE
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+
+# Secrets / Env
+
+.env
+.env.*
+*.pem
+*.key
+*.crt
