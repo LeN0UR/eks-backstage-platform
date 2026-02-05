@@ -19,7 +19,6 @@ variable "private_subnet_cidrs" {
 }
 
 variable "tags" {
-  description = "Common tags applied to all resources"
+  description = "Tags applied to all resources"
   type        = map(string)
-  default     = {}
 }

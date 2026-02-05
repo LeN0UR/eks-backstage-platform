@@ -1,61 +1,50 @@
+data "aws_region" "current" {}
+
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_support   = true
   enable_dns_hostnames = true
 
-  tags = {
-    Name  = "backstage-vpc"
-  }
+  tags = var.tags
 }
 
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
-
-  tags = {
-    Name = "backstage-igw"
-  }
+  tags   = var.tags
 }
 
 resource "aws_subnet" "public_az1" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.0.0/20"
-  availability_zone       = "eu-west-2a"
+  availability_zone       = var.availability_zones[0]
   map_public_ip_on_launch = true
 
-  tags = {
-    Name = "backstage-public-az1"
-  }
+  tags = var.tags
 }
 
 resource "aws_subnet" "public_az2" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.16.0/20"
-  availability_zone       = "eu-west-2b"
+  availability_zone       = var.availability_zones[1]
   map_public_ip_on_launch = true
 
-  tags = {
-    Name = "backstage-public-az2"
-  }
+  tags = var.tags
 }
 
 resource "aws_subnet" "private_az1" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.0.32.0/20"
-  availability_zone = "eu-west-2a"
+  availability_zone = var.availability_zones[0]
 
-  tags = {
-    Name = "backstage-private-az1"
-  }
+  tags = var.tags
 }
 
 resource "aws_subnet" "private_az2" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.0.48.0/20"
-  availability_zone = "eu-west-2b"
+  availability_zone = var.availability_zones[1]
 
-  tags = {
-    Name = "backstage-private-az2"
-  }
+  tags = var.tags
 }
 
 resource "aws_eip" "nat_az1" {
@@ -69,22 +58,16 @@ resource "aws_eip" "nat_az2" {
 resource "aws_nat_gateway" "az1" {
   allocation_id = aws_eip.nat_az1.id
   subnet_id     = aws_subnet.public_az1.id
-
-  tags = {
-    Name = "backstage-nat-az1"
-  }
+  tags          = var.tags
 }
 
 resource "aws_nat_gateway" "az2" {
   allocation_id = aws_eip.nat_az2.id
   subnet_id     = aws_subnet.public_az2.id
-
-  tags = {
-    Name = "backstage-nat-az2"
-  }
+  tags          = var.tags
 }
-  
-  resource "aws_route_table" "public" {
+
+resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
   route {
@@ -92,9 +75,7 @@ resource "aws_nat_gateway" "az2" {
     gateway_id = aws_internet_gateway.main.id
   }
 
-  tags = {
-    Name = "backstage-public-rt"
-  }
+  tags = var.tags
 }
 
 resource "aws_route_table" "private_az1" {
@@ -105,9 +86,7 @@ resource "aws_route_table" "private_az1" {
     nat_gateway_id = aws_nat_gateway.az1.id
   }
 
-  tags = {
-    Name = "backstage-private-rt-az1"
-  }
+  tags = var.tags
 }
 
 resource "aws_route_table" "private_az2" {
@@ -118,17 +97,20 @@ resource "aws_route_table" "private_az2" {
     nat_gateway_id = aws_nat_gateway.az2.id
   }
 
-  tags = {
-    Name = "backstage-private-rt-az2"
-  }
+  tags = var.tags
 }
 
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id            = aws_vpc.main.id
+  service_name      = "com.amazonaws.${data.aws_region.current.name}.s3"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids = [
+    aws_route_table.private_az1.id,
+    aws_route_table.private_az2.id
+  ]
 
-
-
-
-
-
+  tags = var.tags
+}
 
 
 
