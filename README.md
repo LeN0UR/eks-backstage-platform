@@ -1,19 +1,35 @@
 # eks-backstage-platform
 
-Production-style deployment of an Internal Developer Portal (Backstage) on AWS EKS using Terraform, GitOps with ArgoCD, secure CI/CD, automated DNS/TLS, and full cluster observability. i will be focusing on updating this readme at a later stage.
+Production-style deployment of an Internal Developer Portal (Backstage) on AWS EKS, using Terraform, GitOps with ArgoCD, secure CI/CD pipelines, automated DNS and TLS, and cluster observability.
 
-# Debugging log
-(Summary of issues I ran while building this project, and their solutions)
-(Forgot that s3 bucket names had to be lowercase)
-(Initially did not set the name values for my bucket and dynamodb so the plan kept asking me for values. Added default values to solve this)
-Terraform backend: S3 backends require the bucket to exist before terraform init. Solved via a separate bootstrap module using local state.
+This project focuses on **infrastructure design, correctness, and clarity** over rushing deployments.  
+The README will be expanded as the platform evolves.
 
-Local vs remote state: Used a local backend during development to allow init, validate, and plan without needing S3/DynamoDB. Local backend still supports apply.
+---
 
-Module inputs: Unsupported argument errors came from missing variables in the module itself. Module inputs must be declared in the module’s variables.tf.
+## Debugging Log
 
-Variable loading: Terraform only auto-loads terraform.tfvars and *.auto.tfvars. Missing or misnamed files cause interactive prompts.
+A short record of key issues encountered and how they were resolved while building the foundation.
 
-Provider region: Resources defaulted to us-west-2 due to environment settings. Fixed by explicitly setting the AWS provider region.
+- **S3 constraints**  
+  S3 bucket names must be lowercase. Missing or mismatched bucket names caused early backend issues.
 
-Cost awareness: VPC includes NAT Gateways, so infrastructure was validated with terraform plan only to avoid unnecessary cost.
+- **Terraform backend bootstrapping**  
+  S3 backends require the bucket to exist before `terraform init`. Solved by introducing a separate bootstrap module using local state.
+
+- **Local vs remote state**  
+  Used a local backend during active development to allow `init`, `validate`, and `plan` without S3/DynamoDB. Local state still fully supports `apply`.
+
+- **Module inputs**  
+  `Unsupported argument` errors were caused by variables being passed to modules without being declared inside the module’s `variables.tf`.
+
+- **Variable loading**  
+  Terraform only auto-loads `terraform.tfvars` and `*.auto.tfvars`. Misnamed files caused interactive prompts.
+
+- **Provider region**  
+  Resources defaulted to `us-west-2` due to environment configuration. Fixed by explicitly setting the AWS provider region.
+
+- **Cost awareness**  
+  The VPC design includes NAT Gateways, so infrastructure was validated using `terraform plan` only to avoid unnecessary costs.
+
+---
