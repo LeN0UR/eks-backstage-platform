@@ -1,24 +1,75 @@
+# VPC
+
 variable "vpc_cidr" {
-  description = "CIDR block for the VPC"
-  type        = string
+  type = string
 }
 
 variable "availability_zones" {
-  description = "Availability zones to use"
-  type        = list(string)
+  type = list(string)
 }
 
 variable "public_subnet_cidrs" {
-  description = "CIDR blocks for public subnets"
-  type        = list(string)
+  type = list(string)
 }
 
 variable "private_subnet_cidrs" {
-  description = "CIDR blocks for private subnets"
-  type        = list(string)
+  type = list(string)
 }
 
+# IAM
+
+variable "cluster_role_name" {
+  type = string
+}
+
+variable "node_role_name" {
+  type = string
+}
+
+# EKS
+
+variable "cluster_name" {
+  type = string
+}
+
+variable "instance_types" {
+  type = list(string)
+}
+
+variable "node_desired_size" {
+  type = number
+}
+
+variable "node_min_size" {
+  type = number
+}
+
+variable "node_max_size" {
+  type = number
+}
+
+# ECR
+
+variable "repository_name" {
+  type = string
+}
+
+variable "max_image_count" {
+  type = number
+}
+
+# Route53
+
+variable "domain_name" {
+  type = string
+}
+
+variable "app_domain_name" {
+  type = string
+}
+
+# Global
+
 variable "tags" {
-  description = "Tags applied to all resources"
-  type        = map(string)
+  type = map(string)
 }
